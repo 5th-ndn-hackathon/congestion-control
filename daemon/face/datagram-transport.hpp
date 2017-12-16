@@ -137,6 +137,15 @@ DatagramTransport<T, U>::doSend(Transport::Packet&& packet)
 {
   NFD_LOG_FACE_TRACE(__func__);
 
+  int outQueueSize = -1;
+  ioctl(m_socket.native_handle(), TIOCOUTQ, &outQueueSize);
+  if (outQueueSize > 0) {
+    std::cout << "CONGESTION: " << outQueueSize << std::endl;
+  }
+  else {
+    std::cout << outQueueSize << std::endl;
+  }
+
   m_socket.async_send(boost::asio::buffer(packet.packet),
                       bind(&DatagramTransport<T, U>::handleSend, this,
                            boost::asio::placeholders::error,
