@@ -30,6 +30,7 @@
 #include "core/global-io.hpp"
 
 #include <array>
+#include <iostream>
 
 namespace nfd {
 namespace face {
