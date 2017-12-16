@@ -29,8 +29,11 @@
 #include "transport.hpp"
 #include "core/global-io.hpp"
 
+#include <ndn-cxx/lp/packet.hpp>
+
 #include <array>
 #include <iostream>
+#include <linux/sockios.h>
 
 namespace nfd {
 namespace face {
@@ -138,16 +141,21 @@ DatagramTransport<T, U>::doSend(Transport::Packet&& packet)
 {
   NFD_LOG_FACE_TRACE(__func__);
 
-  int outQueueSize = -1;
-  ioctl(m_socket.native_handle(), TIOCOUTQ, &outQueueSize);
-  if (outQueueSize > 0) {
-    std::cout << "CONGESTION: " << outQueueSize << std::endl;
-  }
-  else {
-    std::cout << outQueueSize << std::endl;
+  int tio = -1;
+  //int sio = -1;
+  int maxBufSize = -1;
+  unsigned int maxBufSizeLen = sizeof(maxBufSize);
+  ioctl(m_socket.native_handle(), TIOCOUTQ, &tio);
+  getsockopt(m_socket.native_handle(), SOL_SOCKET, SO_SNDBUF, &maxBufSize, &maxBufSizeLen);
+  //ioctl(m_socket.native_handle(), SIOCOUTQNSD, &sio);
+  lp::Packet pkt(packet.packet);
+  if (maxBufSize - tio < 16000) {
+    size_t pktSize = packet.packet.size();
+    std::cout << "CONGESTION: " << tio << " out of " << maxBufSize << " (" << ((double)tio / (double)pktSize) << ")" << std::endl;
+    pkt.add<lp::CongestionMarkField>(1);
   }
 
-  m_socket.async_send(boost::asio::buffer(packet.packet),
+  m_socket.async_send(boost::asio::buffer(pkt.wireEncode()),
                       bind(&DatagramTransport<T, U>::handleSend, this,
                            boost::asio::placeholders::error,
                            boost::asio::placeholders::bytes_transferred,
