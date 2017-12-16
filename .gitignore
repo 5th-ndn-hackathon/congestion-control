@@ -7,3 +7,5 @@
 build/
 VERSION
 unit-tests.conf
+Makefile
+createface.sh
