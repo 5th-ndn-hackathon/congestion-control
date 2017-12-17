@@ -50,7 +50,7 @@ EthernetTransport::EthernetTransport(const ndn::net::NetworkInterface& localEndp
   , m_hasRecentlyReceived(false)
 #ifdef _DEBUG
   , m_nDropped(0)
-  , m_nlSock(nl_socket_alloc())
+  //, m_nlSock(nl_socket_alloc())
 #endif
 {
   try {
@@ -61,7 +61,18 @@ EthernetTransport::EthernetTransport(const ndn::net::NetworkInterface& localEndp
     BOOST_THROW_EXCEPTION(Error(e.what()));
   }
 
-  int error = nl_cache_mngr_alloc(m_nlSock, NETLINK_ROUTE, NL_AUTO_PROVIDE, &m_nlMngr);
+  // Thanks to: https://stackoverflow.com/questions/20657266/how-to-set-up-netem-qdisc-and-tbf-qdisc-using-libnl-route
+  /*nl_connect(m_nlSock, NETLINK_ROUTE);
+  rtnl_link_alloc_cache(m_nlSock, AF_UNSPEC, &m_nlCache);
+  m_nlLink = rtnl_link_get_by_name(m_nlCache, m_interfaceName.c_str());
+  m_nlIfIndex = rtnl_link_get_ifindex(m_nlLink);
+  m_nlQdisc = rtnl_qdisc_alloc();
+  rtnl_tc_set_ifindex(TC_CAST(m_nlQdisc), m_nlIfIndex);
+  rtnl_tc_set_parent(TC_CAST(m_nlQdisc), TC_H_ROOT);
+  rtnl_tc_set_handle(TC_CAST(m_nlQdisc), TC_HANDLE(1, 0));
+  rtnl_tc_set_kind(TC_CAST(m_nlQdisc), "tbf");*/
+
+  /*int error = nl_cache_mngr_alloc(m_nlSock, NETLINK_ROUTE, NL_AUTO_PROVIDE, &m_nlMngr);
   if (error < 0) {
     NFD_LOG_FACE_ERROR("Netlink error on cache manager allocate: " << error);
   }
@@ -73,6 +84,11 @@ EthernetTransport::EthernetTransport(const ndn::net::NetworkInterface& localEndp
     NFD_LOG_FACE_ERROR("Link '" << m_interfaceName << "' does not exist");
   }
   m_nlIfIndex = rtnl_link_get_ifindex(m_nlLink);
+  NFD_LOG_FACE_ERROR("Link IfIndex = " << m_nlIfIndex);
+
+  rtnl_tc_set_link(&m_nlTc, m_nlLink);
+  m_nlHandle = rtnl_tc_get_handle(&m_nlTc);
+  std::cout << m_nlHandle << std::endl;*/
 
   asyncRead();
 }
@@ -117,7 +133,7 @@ EthernetTransport::sendPacket(const ndn::Block& block)
     buffer.appendByteArray(padding, ethernet::MIN_DATA_LEN - block.size());
   }
 
-  ndn::EncodingBuffer* bufferPtr = &buffer;
+  //ndn::EncodingBuffer* bufferPtr = &buffer;
 
   // construct and prepend the ethernet header
   static uint16_t ethertype = htons(ethernet::ETHERTYPE_NDN);
@@ -125,7 +141,7 @@ EthernetTransport::sendPacket(const ndn::Block& block)
   buffer.prependByteArray(m_srcAddress.data(), m_srcAddress.size());
   buffer.prependByteArray(m_destAddress.data(), m_destAddress.size());
 
-  int errQdiscAlloc = rtnl_qdisc_alloc_cache(m_nlSock, &m_nlQdiscCache);
+  /*int errQdiscAlloc = rtnl_qdisc_alloc_cache(m_nlSock, &m_nlQdiscCache);
   if (errQdiscAlloc < 0) {
     NFD_LOG_FACE_ERROR("Unable to allocate libnl cache: " << errQdiscAlloc);
   }
@@ -150,14 +166,14 @@ EthernetTransport::sendPacket(const ndn::Block& block)
         bufferPtr = &pktBuffer;
       }
     }
-  }
+  }*/
 
   // send the frame
-  int sent = pcap_inject(m_pcap, bufferPtr->buf(), bufferPtr->size());
+  int sent = pcap_inject(m_pcap, buffer.buf(), buffer.size());
   if (sent < 0)
     handleError("Send operation failed: " + m_pcap.getLastError());
   else if (static_cast<size_t>(sent) < buffer.size())
-    handleError("Failed to send the full frame: size=" + to_string(bufferPtr->size()) +
+    handleError("Failed to send the full frame: size=" + to_string(buffer.size()) +
                 " sent=" + to_string(sent));
   else
     // print block size because we don't want to count the padding in buffer
