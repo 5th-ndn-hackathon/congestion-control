@@ -196,7 +196,12 @@ StreamTransport<T>::handleSend(const boost::system::error_code& error,
   NFD_LOG_FACE_TRACE("Successfully sent: " << nBytesSent << " bytes");
 
   BOOST_ASSERT(!m_sendQueue.empty());
+
   m_sendQueue.pop();
+
+  if () {
+    std::cout << "" << std::endl;
+  }
 
   if (!m_sendQueue.empty())
     sendFromQueue();

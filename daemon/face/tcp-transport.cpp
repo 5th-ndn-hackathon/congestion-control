@@ -174,15 +174,15 @@ void
 TcpTransport::tcpCheck(Transport::Packet& packet)
 {
   int tio = -1;
-  //int sio = -1;
+  int sio = -1;
   int maxBufSize = -1;
   unsigned int maxBufSizeLen = sizeof(maxBufSize);
   ioctl(m_socket.native_handle(), TIOCOUTQ, &tio);
   getsockopt(m_socket.native_handle(), SOL_SOCKET, SO_SNDBUF, &maxBufSize, &maxBufSizeLen);
-  //ioctl(m_socket.native_handle(), SIOCOUTQNSD, &sio);
+  ioctl(m_socket.native_handle(), SIOCOUTQNSD, &sio);
   if (maxBufSize - tio < 16000) {
     size_t pktSize = packet.packet.size();
-    std::cout << "CONGESTION: " << tio << " out of " << maxBufSize << " (" << ((double)tio / (double)pktSize) << ")" << std::endl;
+    std::cout << "CONGESTION: " << tio  << " SIO " << sio << " out of " << maxBufSize << " (" << ((double)tio / (double)pktSize) << ")" << std::endl;
     lp::Packet pkt(packet.packet);
     pkt.add<lp::CongestionMarkField>(1);
     packet.packet = pkt.wireEncode();
