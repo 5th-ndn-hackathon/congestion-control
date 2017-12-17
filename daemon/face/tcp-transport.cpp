@@ -184,7 +184,7 @@ TcpTransport::tcpCheck(Transport::Packet& packet)
     size_t pktSize = packet.packet.size();
     std::cout << "CONGESTION: " << tio  << " SIO " << sio << " out of " << maxBufSize << " (" << ((double)tio / (double)pktSize) << ")" << std::endl;
     lp::Packet pkt(packet.packet);
-    pkt.add<lp::CongestionMarkField>(1);
+    pkt.set<lp::CongestionMarkField>(1);
     packet.packet = pkt.wireEncode();
   }
 }

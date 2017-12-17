@@ -153,7 +153,7 @@ DatagramTransport<T, U>::doSend(Transport::Packet&& packet)
     std::cout << "CONGESTION: " << tio << " out of " << maxBufSize << " (" << ((double)tio / (double)pktSize) << ")" << std::endl;
     if (tio > 50000) {
       lp::Packet pkt(packet.packet);
-      pkt.add<lp::CongestionMarkField>(1);
+      pkt.set<lp::CongestionMarkField>(1);
       packet.packet = pkt.wireEncode();
     }
   }
