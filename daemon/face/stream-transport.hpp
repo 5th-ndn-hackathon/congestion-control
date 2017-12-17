@@ -96,7 +96,7 @@ protected:
 
   NFD_LOG_INCLASS_DECLARE();
 
-private:
+protected:
   uint8_t m_receiveBuffer[ndn::MAX_NDN_PACKET_SIZE];
   size_t m_receiveBufferSize;
   std::queue<Block> m_sendQueue;
