@@ -1,0 +1,627 @@
+\begin{frame}{Current State of Congestion Control}
+
+No working implementation in NFD or CCNx.
+\begin{itemize}
+	\item ccncatchunks, ndn
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Two Trends: Content \& Mobility}
+	\includegraphics[width=\linewidth]{images/cisco_mobile.png}\\
+	\scriptsize
+	Source: Cisco VNI Mobile, 2015
+\end{frame}
+
+%\fullframeimage{images/cisco_mobile.jpg}
+%\fullframeimage{images/video_traffic_growth.png}
+%\fullframeimage{images/mobile_user_growth.png}
+%
+
+%\begin{frame}{Some Solutions}
+%	\large
+%	\begin{enumerate}
+%		\item Mobility Solutions: Network Selection
+%%		\begin{itemize}
+%%			\item[-] Network Selection
+%%			\item[-] Multihoming
+%%		\end{itemize}
+%		\item Information-Centric Networking %(CCN/NDN)
+%%		\pause
+%		\item \textbf{Beyond Network Selection}
+%	\end{enumerate}
+%\end{frame}
+%
+%%\begin{frame}{Today's Devices are Multihomed}
+%%	\vspace{-7mm}
+%%	\begin{columns}[T]
+%%		\column{0.6\textwidth}
+%%		\centering
+%%		\includegraphics[width=0.7\textwidth]{images/phone_tablet.png}
+%%		%\vspace{10cm}
+%%		\column{0.4\textwidth}
+%%		%\textbf{
+%%		\begin{enumerate}
+%%			\item Mobile
+%%			\item Wireless
+%%			\item Multiple NICs
+%%			\item Multiple Access Networks
+%%		\end{enumerate}
+%%		%}
+%%	\end{columns}
+%%	\textbf{Problem: IP was not designed for Multihoming!}
+%%\end{frame}
+%
+%
+%
+%\begin{frame}{Mobility: Network Selection}
+%	\vspace*{-1.5em}
+%	\includegraphics[width=1\linewidth]{images/ccn_handoff.pdf}
+%\end{frame}
+%
+%\note[enumerate]{
+%	\item Vertical vs. horizontal handovers
+%	\item Handover decision vs. network selection	
+%}
+%
+%% Multihoming: Choosing the right layer
+%\begin{frame}{Multihoming}
+%	\vspace{-10mm}
+%	\strong{Choosing the right layer:}
+%	\vspace{3mm}
+%	\begin{columns}[c]
+%		
+%		\column{0.58\linewidth}
+%		\footnotesize
+%		\begin{tabular}{ll}
+%			\toprule
+%			\textbf{TCP/IP layer} & \textbf{Multihoming solution} \\ 
+%			\midrule 
+%			\multirow{1}{*}{Application} & App.-based switching \\ 
+%			%& Mobile Data Offloading \\ 
+%			\midrule
+%			\multirow{1}{*}{Transport} & Multipath TCP\\ 
+%			\midrule 
+%			Network & Mobile IP + Extensions \\
+%			\bottomrule
+%		\end{tabular}
+%		\\[4mm]
+%		\includegraphics[width=1\linewidth]{images/mptcp_iphone.png}
+%		
+%		\column{0.42\linewidth}
+%		\includegraphics[width=1.1 \linewidth]{images/hourglass_labels.pdf}
+%		
+%	\end{columns}
+%\end{frame}
+%
+%\note[enumerate]{
+%	\item Application layer: Example of mobile operating systems choosing between WiFi and LTE.
+%	\item Transport-layer: MPTCP deployed in iOS 7, some problems with middleboxes, etc.
+%	\item Network layer:  Mobile IP which allows for transparent mobility, but doesn't do much for using two networks at the same time / flow mobility, etc.
+%	
+%	\item Tradeoff: Universality/Functionality vs. Easy deployment
+%	\item Hard to deploy new protocols on the network layer (see IPv6!)\\
+%	What if it still can be done?
+%}
+%
+%
+%\begin{frame}
+%	\begin{center}
+%		\vfill
+%		\LARGE Information-Centric Networking
+%		\vfill
+%	\end{center}
+%\end{frame}
+%
+%
+%\fullframeimage{images/hawking.png}
+%
+%\begin{frame}{1. Circuit Switching}
+%	\vspace*{-1.5em}
+%	\includegraphics[width=1\linewidth]{images/switchboard.jpg}
+%\end{frame}
+%
+%\begin{frame}{2. Packet Switching}
+%	\centering
+%	\vspace*{-1.5em}
+%	\includegraphics[width=0.95\linewidth]{images/baran.png}\\[0.1em]
+%	\bfseries
+%	P. Baran - Distributed communication networks (1964) 
+%\end{frame}
+%
+%\begin{frame}{3. The Clean Slate: Named Data Networking}
+%	\vspace{-10mm}
+%	Van Jacobson - \emph{A New Way to Look at Networking (2006)}
+%	\vspace{3mm}
+%	\begin{columns}
+%		\column{0.35\linewidth}
+%		\centering
+%		\includegraphics[width=1.2\linewidth]{images/hourglass_ndn.pdf}
+%		\column{0.65\linewidth}
+%		\includegraphics[width=1\linewidth]{images/ccn_packet_flow.png}
+%	\end{columns}
+%%	\vspace{3mm}
+%%	$\rightarrow$ Solving Multihoming Problems with Named Data?
+%%	\vspace{10cm}
+%\end{frame}
+%
+%\note[enumerate]{
+%	\item NDN Introduction: Van Jacobson, Interest/Data-Flow, Universal caching
+%	\item If NDN is coming: Exploit it for the multihoming challenge?
+%}
+%
+%
+%\begin{frame}{Why NDN? Breadcrumbs!}
+%	\vspace*{-2em}
+%	\large
+%	\only<1-2>{
+%		Host identifiers $\rightarrow$ Content identifiers\\[1em]
+%	}
+%	\begin{center}
+%		\includegraphics<2>[width=1\linewidth]{images/hansel2.jpg}
+%		\includegraphics<3>[width=0.9\linewidth]{images/breadcrumbs_small.png}
+%	\end{center}
+%	\vspace*{-.6cm}
+%	\only<3>{
+%		$\rightarrow$ Loop-free multipath routing
+%	}
+%\end{frame}
+%
+
+%\begin{frame}
+%	\frametitle{Stateful \& Adaptive Forwarding!}
+%	\vspace{-2em}
+%	%\includegraphics[width=\linewidth]{images/ccn_router.png}\\
+%	\begin{columns}[c]
+%		\column{0.45\linewidth}
+%		\centering
+%		IP Routing Table\\[1mm]
+%		
+%		\begin{tabular}{ll}
+%			\toprule
+%			Destination & Nexthop \\ 
+%			\midrule
+%			171.69.7.0/24 & eth0 \\
+%			171.69.0.0/16 & eth1 \\
+%			0.0.0.0/0 & eth2 \\
+%			\bottomrule
+%		\end{tabular}\\[5mm]
+%		
+%		\column{0.55\linewidth}
+%		\includegraphics[width=\linewidth]{images/ccn_fib.png}\\
+%	\end{columns}
+%	
+%	IP: Smart Routing, Dumb Forwarding\\
+%	\textbf{NDN: Multipath Routing, Adaptive Forwarding}\\[.7em]
+%	$\rightarrow$ See Yi et al. -- \emph{A case for stateful forwarding plane (2013)}
+%	%\begin{block}{}
+%	%	\begin{enumerate}
+%	%		\item Transparent Handovers
+%	%		\item Load Balancing
+%	%	\end{enumerate}
+%	%\end{block}
+%\end{frame}
+
+\begin{frame}{Multihomed Terminal Scenario}
+	\begin{center}
+		\vspace*{-1.5em}
+		\includegraphics[width=0.9\linewidth]{images/scenario_old.pdf}
+	\end{center}
+\end{frame}
+
+
+\begin{frame}{Characteristics of the Scenario}
+	\vspace*{-1em}
+	%	\large
+	\begin{block}{Common Observations}
+		\begin{enumerate}
+			\item Different Application Requirements
+			\item Different Access Network Characteristics
+			\item Different Cost Factors
+%			\item[+] Restricting changes to the terminal
+		\end{enumerate}
+	\end{block}
+	%\begin{block}<2>{Requirements}
+	%	\begin{itemize}
+	%		\item[$\rightarrow$] Cost \& Energy Awareness
+	%		\item[$\rightarrow$] Reacting to changes in link quality
+	%		\item[$\rightarrow$] Exploiting multiple access networks
+	%		\item[$\rightarrow$] Restricting changes to the terminal
+	%	\end{itemize}	
+	%\end{block}
+	\textbf{Goal: Doing better than IP Network Selection}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Solution: Stateful \& Adaptive Forwarding!}
+	\vspace{-2em}
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/ccn_fib.png}\\[.6em]
+%	$\rightarrow$ 
+	%See Yi et al. -- \emph{A case for stateful forwarding plane (2013)}
+	
+	\scriptsize
+	Source: Van Jacobson et al. - Networking Named Content (2009)
+\end{frame}
+
+
+%\begin{frame}{Why NDN? 3. Support for conversational Apps}
+%	\vspace*{-2em}
+%	\begin{center}
+%		\includegraphics[width=0.65\linewidth]{images/voip_phone.png}
+%	\end{center}
+%\end{frame}
+
+
+%\note[enumerate]{
+%	\item Left: IP Router, only one outgoing interface per route\\
+%	Can improve with Software-Defined Networking, but SDN needs control over the network and still the whole intelligence is in the controller + Dumb SDN switches.
+%	\item Right: CCN FIB can hold multiple entries (+ is loop-free) $\rightarrow$ Smart, adaptive forwarding\\
+%	Possible in the backbone, but also on end-devices.
+%}
+
+
+
+
+
+
+
+%\begin{frame}{System Architecture \& Design}
+%	\vspace*{-1.5em}
+%	\begin{center}
+%	\includegraphics<1>[width=\linewidth]{images/system_architecture3.png}
+%	\includegraphics<2>[width=\linewidth]{images/system_profile_layer.png}
+%	\only<3>{
+%		\begin{columns}
+%		\column{0.35\linewidth}
+%		\begin{enumerate}
+%			\item Passive Monitoring
+%			\item Active Probing
+%%			\item External Input
+%		\end{enumerate}
+%		\vspace*{.5em}
+%		$\rightarrow$ Moving Average
+%		\column{0.65\linewidth}
+%		\includegraphics[width=1\linewidth]{images/system_interface_estimation3.png}
+%		\end{columns}
+%}
+%	\includegraphics<4>[width=\linewidth]{images/system_forwarding_strategies.png}
+%	\end{center}
+%\end{frame}
+
+
+\begin{frame}{System Architecture \& Design}
+	\vspace*{-1.5em}
+	\begin{center}
+		\includegraphics[width=\linewidth]{images/system_architecture4.png}
+	\end{center}
+\end{frame}
+
+%\begin{frame}{System Architecture -- Profile Layer}
+%	\vspace*{-1.5em}
+%	\begin{center}
+%		\includegraphics[width=\linewidth]{images/system_profile_layer.png}
+%	\end{center}
+%\end{frame}
+
+\begin{frame}{System Architecture -- Interface Estimation}
+	\vspace*{-1.5em}
+	\begin{center}
+			\begin{columns}
+				\column{0.35\linewidth}
+				\begin{enumerate}
+					\item Passive Monitoring
+					\item Active Probing
+					%			\item External Input
+				\end{enumerate}
+				\vspace*{.5em}
+				$\rightarrow$ Moving Average
+				\column{0.65\linewidth}
+				\includegraphics[width=1\linewidth]{images/system_interface_estimation3.png}
+			\end{columns}
+	\end{center}
+\end{frame}
+
+\begin{frame}{System Architecture -- Forwarding Strategies}
+	\vspace*{-1.5em}
+	\begin{center}
+		\includegraphics[width=\linewidth]{images/system_forwarding_strategies.png}
+	\end{center}
+\end{frame}
+
+
+\begin{frame}[t]{Strategies - Best Interface First}
+	\begin{center}
+	\includegraphics[width=1\linewidth]{images/forwarding_bif.pdf}%	\\[3mm]
+	\end{center}
+%	Examples: CCNx Default, NDN BestRoute,\\ Yi et al. -- \emph{A case for stateful forwarding plane (2013)}, \emph{INFORM} (2013), \emph{PAF} (2013)
+\end{frame}
+
+\note[enumerate]{
+	\item Send on best path first. On packet loss: try other paths.
+	\item CCNx Default: Switching path on packet loss,  Interface probing to find better path!
+	\item NDN BestRoute: Use interface with smallest routing costs.
+	\item Yi et al: Coloring scheme, Interest NACK.
+}
+
+\begin{frame}[t]{Strategies - Packet Striping}
+	%\vspace{-4mm}
+	\begin{center}
+	\includegraphics[width=1\linewidth]{images/forwarding_packet_striping.pdf}%\\[3mm]
+	\end{center}
+%	Examples: CCNx Loadsharing, Carofiglio et al. -- \\ \emph{Optimal Multipath Congestion Control and Request Forwarding in ICN} (2013), \emph{OMP-IF} (2014), \emph{SAF} (2015)
+\end{frame}
+
+\note[enumerate]{
+	\item Split packets to improve overall throughput
+	\item CCNx Loadsharing: Minimize outstanding Interests, Faster paths get more packets
+	\item Carofiglio et al. (Bell Labs, Orange Labs): Fair loadbalancing with competing traffic
+}
+
+\begin{frame}[t]{Strategies - Parallel Transmission}
+	\begin{center}
+	\includegraphics[width=1\linewidth]{images/forwarding_parallel.pdf}%\\[3mm]
+	\end{center}
+%	Examples: CCNx Parallel,\\ Rossini et al. -- Multipath parallel (2013)
+\end{frame}
+
+\note[enumerate]{
+	\item Sending Interest packets redundantly, accepting the first returning data packets and ignoring later arriving ones.
+	\item CCNx Parallel: Only simplistic flooding = Send every packet to every interface
+	\item Flooding is often unnecessarily wasteful $\rightarrow$ Selective redundancy.
+}
+
+
+\begin{frame}
+	\begin{center}
+		\vfill
+		\LARGE Implementation \& Evaluation
+		\vfill
+	\end{center}
+\end{frame}
+
+%\begin{frame}{Implementation \& Evaluation}
+%	\large
+%	\begin{enumerate}
+%		\item Interface Estimators
+%%		\begin{itemize}
+%%			\item Delay
+%%			\item Bandwidth
+%%			\item Packet Loss
+%%		\end{itemize}
+%		
+%		\item Forwarding Strategies
+%%		\begin{itemize}
+%%			\item Lowest Cost Strategy
+%%			\item MADM Strategy
+%%		\end{itemize}
+%	\end{enumerate}
+%	\vfill
+%\end{frame}
+
+\begin{frame}{Delay Estimator}
+	\vspace*{-1.7em}
+	\textbf{= TCP RTT Estimator}\\[0.8em]
+	\includegraphics[width=\linewidth]{images/moving_average.png}\\[0.5em]
+%	\large
+%	\bfseries
+	Exponential Moving Average (+ variance factor)\\[0.1em]
+%	$EMA_{t} = \alpha * Y_t + (1-\alpha) * EMA_{t-1}  $
+\end{frame}
+
+\begin{frame}{Loss Estimator}
+	\vspace*{-2em}
+	\textbf{No discrete loss values!}
+	\includegraphics[width=0.8\linewidth]{images/loss_status.pdf}
+	\pause
+		\begin{block}{Own Loss Estimator Design!}
+			Based on Simple Moving Average
+		\end{block}
+		\vspace*{0.4em}
+		\includegraphics[width=1\linewidth]{images/loss_window.pdf}
+\end{frame}
+
+\begin{frame}{Loss Estimator -- Measurement Results}
+	\vspace*{-2em}
+	\includegraphics[width=0.47\linewidth]{images/topology2.pdf}\\
+\only<1>{
+	\includegraphics[width=1\linewidth]{images/loss1.pdf}\\
+	Uniform Packet Loss
+}
+%\only<2>{
+%	\includegraphics[width=1\linewidth]{images/loss4.pdf}\\
+%	Uniform Packet Loss \& Congestion at R1
+%}
+%\only<3>{
+%	\includegraphics[width=1\linewidth]{images/loss5.pdf}\\
+%	Uniform Packet Loss, Congestion at R1 \& Bursty Probing
+%}
+\vspace*{1em}
+%			\includegraphics[width=1\linewidth]{images/loss_window.pdf}
+\end{frame}
+
+
+
+\begin{frame}{Bandwidth Estimator}
+	\vspace*{-2em}
+%	= Real-time estimation of available bandwidth of a path\\[.3em]
+	Naive bandwidth probing of \emph{unused paths}\\ %like delay or loss\\ 
+	$\rightarrow$ \textbf{Too much overhead!} 
+	\begin{itemize}
+		\item 1. Passive Bandwidth Estimation
+%		\item<2> 2. Bursty Bandwidth Estimation
+	\end{itemize}
+	\vspace*{.3em}
+	\begin{center}
+		\includegraphics[width=1\linewidth]{images/bw_passive.pdf}
+	\end{center}
+%	\includegraphics<2>[width=1\linewidth]{images/bw_window.pdf}
+	
+\end{frame}
+
+\begin{frame}{Bandwidth Estimator -- 2. Burst Estimation}
+		\vspace*{-2em}
+%	%	= Real-time estimation of available bandwidth of a path\\[.3em]
+%	Probing bandwidth of unused paths like delay or loss\\ $\rightarrow$ \textbf{Too much overhead!} 
+%	\begin{itemize}
+%		\item 1. Passive Bandwidth Estimation
+%		\item<2> 2. Bursty Bandwidth Estimation
+%	\end{itemize}
+%	\vspace*{.3em}
+\begin{center}
+	\includegraphics[width=1\linewidth]{images/bw_window.pdf}
+	\vspace*{.8em}
+%	Results:\\
+	\includegraphics[width=1\linewidth]{images/bw_burst.pdf}
+\end{center}
+\end{frame}
+
+
+\begin{frame}{Lowest Cost Strategy}
+	\vspace*{-1.5em}
+	\begin{block}{Chooses \emph{lowest cost face} that satisfies \emph{all} requirements!}
+		\begin{itemize}
+			\item Requirements: maxloss, maxdelay, minbw
+			\item Cost: Ordinal attribute
+%			\item One priority attribute
+		\end{itemize}
+	\end{block}
+	Example: maxdelay=500ms, maxloss=10\%, prio=delay\\[.5em]
+			\includegraphics[width=0.5\linewidth]{images/topology2.pdf}
+%	\begin{block}{Example: maxdelay=500ms, maxloss=10\%, prio=delay}
+%	\end{block}
+\end{frame}
+
+\begin{frame}{Lowest Cost Strategy -- Measurement Results}
+	\vspace*{-2em}
+	\includegraphics[width=1\linewidth]{images/lcs_packet.pdf}\\[.1em]
+%	\begin{block}{Params: maxdel=500ms, maxloss=10\%, prio=delay}
+		10 sec: Loss deterioration of path 257\\
+		20 sec: Delay deterioration of path 256\\
+		30 sec: Delay recovery\\ 
+		40 sec: Loss recovery
+%	\end{block}
+\end{frame}
+
+%\begin{frame}{Lowest Cost Strategy -- Limitations}
+%	Modeling multiple cost factors? \\
+%\end{frame}
+
+\begin{frame}{MADM Strategy}
+	\vspace*{-1em}
+		\begin{block}{Multiple Attributes + Chooses Highest Value Interface}
+				More flexible requirements:\\
+				\begin{center}
+					\includegraphics[width=1\linewidth]{images/qos.pdf}
+				\end{center}
+			
+		\end{block}
+		Two thresholds: \emph{Min} and \emph{Max}\\
+		Example: delay=20ms-50ms, $cost_1$=10-20, $cost_2$=2-5\\
+		%			Normalizing, Weighting $\rightarrow$ Highest Value Interface
+		
+	
+\end{frame}
+
+\begin{frame}{MADM Strategy: Mobile Traffic Limit Scenario}
+	\vspace*{-1.5em}
+	App1: loss=0\%-40\% \\
+	App2: loss=0\%-40\%, cost=50\%-70\% 
+	\begin{equation}
+%	cost = \frac{t_{consumed}}{t_{limit}} * 100\% 
+	\end{equation}
+	\includegraphics[width=1\linewidth]{images/madm1.pdf}
+\end{frame}
+
+\begin{frame}{Selective Parallel Strategy}
+	\vspace*{-1.5em}
+	Scenario: \textbf{Real-time communications!}
+	\vspace*{.5em}
+	\begin{block}{SP = LCS + Selective Flooding}
+%		When requirements are not met:
+%		\begin{enumerate}
+			1. Req. not met: Flood\\
+			2. Req. not met: Use best 2 paths
+%		\end{enumerate}
+	\end{block}
+	\vspace*{.4em}
+	\includegraphics[width=0.5\linewidth]{images/sp_req.pdf}
+	\includegraphics[width=0.5\linewidth]{images/sp_interests.pdf}
+	
+\end{frame}
+
+\begin{frame}{Summary}
+	\vspace*{-2em}
+%	\begin{columns}[T]
+%	\column{0.6\linewidth}
+	\begin{block}{Adapting NDN to Wireless Multihomed Devices}
+		\begin{itemize}
+			\item Interface Estimation (QoS Awareness)
+			\item New Adaptive Forwarding Strategies
+		\end{itemize}
+	\end{block}
+	\begin{block}{Future Work}
+		\begin{enumerate}
+			\item Details of Parallel Forwarding Strategies
+			\item Realistic evaluation scenarios
+			\item Congestion-Control
+		\end{enumerate}
+	\end{block}
+%		\column{0.4\linewidth}
+%		\includegraphics[width=1\linewidth]{images/dice.png}
+%	\end{columns}
+	\vspace*{.5em}
+\end{frame}
+
+
+%% Last slide
+\begin{frame}
+	\frametitle{The End}
+	\vspace{2cm}
+	{\huge Thank you for
+		your attention!
+	}
+	\vspace{2cm}  
+	\begin{flushright}  
+		Klaus Schneider \\ \footnotesize{\href{mailto:klaus.schneider@uni-bamberg.de}{klaus.schneider@uni-bamberg.de\\
+		klaus@cs.arizona.edu}}
+	\end{flushright}
+\end{frame}
+
+%\begin{frame}{Picture References}
+%	\vspace*{-1em}
+%	\scriptsize
+%%	Page : http://wallpaperswiki.com/wallpapers/2012/10/Black-Swan-Lake-1050x1680.jpg \\
+%	
+%	Page \pageref{fig:moores_law}: http://www.systemcomic.com/2012/05/14/the-system-580-other-moores-laws/ \\
+%	
+%	Page 7 \& 8: http://www.cisco.com/c/dam/en/us/solutions/service-provider/vni-service-adoption-forecast/index.html \\
+%	
+%	Page 13: 
+%	http://ibrahimmohd.blogspot.de/2012/10/a-brief-history-of-time-stephen-hawking.html\\
+%	
+%	Page 14: http://www.elitetele.com/images/uploads/news\_thumbs/1960s\_Switchboard\_770x540.jpg \\
+%	
+%	Page 15: Baran, Paul. "On distributed communications networks." Communications Systems, IEEE Transactions on 12.1 (1964): 1-9. \\
+%	
+%	Page 24: http://solofanaticosdelcine.blogspot.de/2013/02/movie-games-hansel-y-gretel.html \\
+%	
+%	Page 25: 
+%	https://komplettie.files.wordpress.com/2010/02/voip-phone-old-phone.png?w=300\&h=227 \\
+%	
+%	Page 33: 
+%	https://en.wikipedia.org/wiki/File:MovingAverage.GIF \\
+%	
+%	
+%\end{frame}
+
+%% Backup Slides
+%\begin{frame}{Backup Slides}
+%
+%\end{frame}
+%
+%\begin{frame}{Measurement Study}
+%\includegraphics<1>[width=1\linewidth]{images/measurements_time.pdf}
+%\includegraphics<2>[width=1\linewidth]{images/measurements_interests.pdf}
+%\includegraphics<3>[width=1\linewidth]{images/measurements_linklayer.pdf}
+%\end{frame}

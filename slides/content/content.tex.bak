@@ -1,0 +1,428 @@
+\begin{frame}{Today's Devices are Multihomed}
+\vspace{-7mm}
+\begin{columns}[T]
+\column{0.6\textwidth}
+\centering
+\includegraphics[width=0.7\textwidth]{images/phone_tablet.png}
+%\vspace{10cm}
+\column{0.4\textwidth}
+%\textbf{
+\begin{enumerate}
+\item Mobile
+\item Wireless
+\item Multiple NICs
+\item Multiple Access Networks
+\end{enumerate}
+%}
+\end{columns}
+\textbf{Problem: IP was not designed for Multihoming!}
+\end{frame}
+
+% Multihoming: Choosing the right layer
+\begin{frame}{Can IP-Overlays solve the problem?}
+\vspace{-10mm}
+\strong{Choosing the right layer:}
+\vspace{3mm}
+\begin{columns}[c]
+
+\column{0.58\linewidth}
+\footnotesize
+\begin{tabular}{ll}
+\toprule
+\textbf{TCP/IP layer} & \textbf{Multihoming solution} \\ 
+\midrule 
+ \multirow{1}{*}{Application} & App.-based switching \\ 
+%& Mobile Data Offloading \\ 
+\midrule
+\multirow{1}{*}{Transport} & Multipath TCP\\ 
+\midrule 
+Network & Mobile IP + Extensions \\
+\bottomrule
+\end{tabular}
+\\[4mm]
+\includegraphics[width=1\linewidth]{images/mptcp_iphone.png}
+
+\column{0.42\linewidth}
+\includegraphics[width=1.1 \linewidth]{images/hourglass_labels.pdf}
+
+\end{columns}
+\end{frame}
+
+\note[enumerate]{
+\item Application layer: Example of mobile operating systems choosing between WiFi and LTE.
+\item Transport-layer: MPTCP deployed in iOS 7, some problems with middleboxes, etc.
+\item Network layer:  Mobile IP which allows for transparent mobility, but doesn't do much for using two networks at the same time / flow mobility, etc.
+
+\item Tradeoff: Universality/Functionality vs. Easy deployment
+\item Hard to deploy new protocols on the network layer (see IPv6!)\\
+What if it still can be done?
+}
+
+\begin{frame}{The Clean Slate: Information-Centric Networking}
+\vspace{-5mm}
+Van Jacobson - \emph{A New Way to Look at Networking (2006)}
+\vspace{3mm}
+\begin{columns}
+\column{0.35\linewidth}
+             \centering
+\includegraphics[width=1.2\linewidth]{images/hourglass_ccn.pdf}
+\column{0.65\linewidth}
+\includegraphics[width=1\linewidth]{images/ccn_packet_flow.png}
+\end{columns}
+\vspace{3mm}
+$\rightarrow$ Solving Multihoming Problems with Named Data?
+\vspace{10cm}
+\end{frame}
+
+\note[enumerate]{
+\item CCN Introduction: Van Jacobson, Interest/Data-Flow, Universal caching
+\item If CCN is coming: Exploit it for the multihoming challenge?
+}
+
+
+\begin{frame}
+\frametitle{Why CCN? Stateful \& Adaptive Forwarding!}
+\vspace{-2em}
+%\includegraphics[width=\linewidth]{images/ccn_router.png}\\
+\begin{columns}[c]
+\column{0.45\linewidth}
+\centering
+IP Routing Table\\[1mm]
+
+\begin{tabular}{ll}
+\toprule
+Destination & Nexthop \\ 
+\midrule
+171.69.7.0/24 & eth0 \\
+171.69.0.0/16 & eth1 \\
+0.0.0.0/0 & eth2 \\
+\bottomrule
+\end{tabular}\\[5mm]
+
+\column{0.55\linewidth}
+\includegraphics[width=\linewidth]{images/ccn_fib.png}\\
+\end{columns}
+
+IP: Smart Routing, Dumb Forwarding\\
+\textbf{CCN: Multipath Routing, Adaptive Forwarding}\\
+%\begin{block}{}
+\begin{enumerate}
+\item Transparent Handovers
+\item Load Balancing
+\end{enumerate}
+%\end{block}
+
+\end{frame}
+
+\note[enumerate]{
+\item Left: IP Router, only one outgoing interface per route\\
+Can improve with Software-Defined Networking, but SDN needs control over the network and still the whole intelligence is in the controller + Dumb SDN switches.
+\item Right: CCN FIB can hold multiple entries (+ is loop-free) $\rightarrow$ Smart, adaptive forwarding\\
+Possible in the backbone, but also on end-devices.
+}
+
+\begin{frame}{3. Improved Handover Performance}
+\begin{center}
+\vspace{-2.5em}
+\includegraphics<1>[width=1\linewidth]{images/ccn_handoff_1.pdf}
+\includegraphics<2>[width=1\linewidth]{images/ccn_handoff_2.pdf}
+\end{center}
+\end{frame}
+
+\note[enumerate]{
+\item Node moves from AR1 to AR2
+\item Packets are lost at link to AR1 (packets on link = bandwidth delay product, but 
+\begin{itemize}
+\item CCN can be connected to AR1 and AR2 simultaneously and still get the returning packets
+\item Packets are also cached at AR2
+\end{itemize}
+\item $\rightarrow$ CCN more efficient on frequent handovers than IP
+}
+
+\begin{frame}
+\frametitle{4. Intrinsic P2P Content Distribution}
+\begin{center}
+%\vfill
+\includegraphics[width=1 \linewidth]{images/ccn_p2p.pdf}
+\vspace{10cm}
+\end{center}
+\end{frame}
+
+\note[enumerate]{
+\item Two networks: One expensive upstream network (e.g., LTE) and one local network (WiFi or Ad-hoc WiFi)
+\item Aiding other nodes in local WiFi network in a P2P fashion.
+\item This is possible in IP networks, but not used widely due too complex setup (application-specific)
+\item In CCN: No infrastructure, software, etc. necessary. Only an intelligent forwarding strategy.
+}
+
+\begin{frame}{How does that work?} %$\rightarrow$ Forwarding Strategies}
+%\strong{3 Broad Categories:}\\[3mm]
+%\begin{columns}[T]
+%\column{0.5\linewidth}
+\vspace{-7mm}
+{\large
+\textbf{CCN Forwarding Strategies}\\
+= Decision where to send Interest packets
+}
+\begin{center}
+\includegraphics[width=0.7\linewidth]{images/strategies_new.pdf}\\
+3 Broad Categories
+\end{center}
+\end{frame}
+
+\begin{frame}[t]{Strategies - Best Interface First}
+%\begin{center}
+\includegraphics[width=1\linewidth]{images/forwarding_bif.pdf}\\[3mm]
+%\end{center}
+Example: CCNx Default, NDN BestRoute, \\Yi et al. - \emph{A case for stateful forwarding plane (2013)}
+\end{frame}
+
+\note[enumerate]{
+\item Send on best path first. On packet loss: try other paths.
+\item CCNx Default: Switching path on packet loss,  Interface probing to find better path!
+\item NDN BestRoute: Use interface with smallest routing costs.
+\item Yi et al: Coloring scheme, Interest NACK.
+}
+
+\begin{frame}[t]{Strategies - Packet Striping}
+%\vspace{-4mm}
+\includegraphics[width=1\linewidth]{images/forwarding_packet_striping.pdf}\\[3mm]
+Example: CCNx Loadsharing, \\Carofiglio et al. - \emph{Optimal Multipath Congestion Control and Request Forwarding in Information-Centric Networks (2013)}
+\end{frame}
+
+\note[enumerate]{
+\item Split packets to improve overall throughput
+\item CCNx Loadsharing: Minimize outstanding Interests, Faster paths get more packets
+\item Carofiglio et al. (Bell Labs, Orange Labs): Fair loadbalancing with competing traffic
+}
+
+\begin{frame}[t]{Strategies - Parallel Transmission}
+%\begin{center}
+\includegraphics[width=1\linewidth]{images/forwarding_parallel.pdf}\\[3mm]
+%\end{center}
+Example: CCNx Parallel
+\end{frame}
+
+\note[enumerate]{
+\item Sending Interest packets redundantly, accepting the first returning data packets and ignoring later arriving ones.
+\item CCNx Parallel: Only simplistic flooding = Send every packet to every interface
+\item Flooding is often unnecessarily wasteful $\rightarrow$ Selective redundancy.
+}
+
+
+\begin{frame}{Measurement Study - Current Strategies}
+\vspace{-8mm}
+\begin{columns}[T]
+\column{0.45\linewidth}
+\begin{block}{CCNx \& NFD Prototype}
+\begin{itemize}
+%\item CCNx \& NFD Prototype
+\item Simplistic design
+\item Poor performance:\\
+Impl. vs. Concept?
+%\item Performance?
+\end{itemize}
+\end{block}
+%\begin{enumerate}
+%\item Properties of Access Networks
+%\item Application Requirements
+%\item Cross-Layer Approach
+%\end{enumerate}
+\column{0.55\linewidth}
+\includegraphics[width=1.0\linewidth]{images/topology_new.pdf}\\
+%\centering
+%Measurement Topology
+\end{columns}
+\textbf{$\rightarrow$ Better Strategy Design?}
+\end{frame}
+%
+%\begin{frame}{Measurement Study - Current Strategies}
+%\includegraphics[width=1\linewidth]{images/measurements_time.pdf}
+%\end{frame}
+
+
+\note[enumerate]{
+\item Real-world measurement study to evaluate the performance of current state-of-the-art forwarding strategies. Detailed results can be seen in the paper.
+\item We found a large gap between what is possible in concept and observed performance.
+\item Due to problems in implementation (congestion control, CPU overhead, etc.)
+\item $\rightarrow$ Should not prevent us from designing more intelligent strategies.
+}
+
+\begin{frame}{Better Strategy Design: Cross-Layer Approach}
+\vspace{-5mm}
+%\textbf{$\rightarrow$ Considering Application Requirements\\ \& Access Networks!}\\[3mm]
+\includegraphics[width=\linewidth]{images/strategy_design2.pdf}
+{\large
+\begin{enumerate}
+\item Cost-Awareness
+\item Selective Redundancy
+\item The Devil is in the detail
+\end{enumerate}
+}
+\end{frame}
+
+\note[enumerate]{
+\item Application Requirements: Differences, e.g. Voice calls (delay sensitive) vs. File traffic
+\item Cost-awareness: Modeling costs of access paths (provider traffic limits, charge per MB, power consumption, etc.)
+\item Measuring Interface performance to choose the best interface for each traffic class.
+\item Bluetooth: Cannot be combined with other types of access networks in IP (again because of complexity)
+\item Selective redundancy: Not flooding, but something more intelligent, taking QoS into account.
+\item Devil \& Details: Interface probing, Interest Lifetime retx, Max. strategy state, Constrained optimization
+}
+
+\begin{frame}{Interdependence with the Link-Layer}
+\vspace{-3mm}
+\begin{columns}[T]
+\column{0.45\linewidth}
+\centering
+\includegraphics[width=1.05\linewidth]{images/hourglass_retx.pdf}\\
+Retransmissions in IP
+\vspace{10cm}
+\column{0.55\linewidth}
+\begin{block}{IP packet loss $\rightarrow$ ARQ}
+\begin{enumerate}
+\item Request packet again
+\item Report loss to higher layer
+\end{enumerate}
+\end{block}
+\end{columns}
+\end{frame}
+
+\note[enumerate]{
+\item Link-layer agreed for local retx, because IP protocol is designed as simple as possible.
+\item Higher-layer retx take much longer
+\item ARQ protocols to deal with packet loss: retransmit packets for a number of times (default of 7 in WiFi) or as long as below certain delay.
+\item No retransmissions on the network layer, because IP doesn't support it.
+}
+
+\begin{frame}{Interdependence with the Link-Layer}
+\vspace{-3mm}
+\begin{columns}[T]
+\column{0.45\linewidth}
+\centering
+\includegraphics[width=1.05\linewidth]{images/hourglass_retx_ccn.pdf}\\
+Retransmissions in CCN
+\vspace{10cm}
+\column{0.55\linewidth}
+\begin{block}{$\rightarrow$ Local Retx and Redundancy on the CCN Strategy Layer}
+\begin{itemize}
+\item Tailored to app. requirements
+\item Knowledge of multiple paths
+\end{itemize}
+\end{block}
+\vspace{-2mm}
+\begin{block}{CCN packet loss}
+\begin{enumerate}
+\item Request packet again
+\item Request on different path
+\item Request on multiple paths
+\item Report loss to higher layer
+\end{enumerate}
+\end{block}
+\end{columns}
+\end{frame}
+
+\note[enumerate]{
+\item CCN layer is much more sophisticated than IP $\rightarrow$ Also hop-to-hop: Can be used for local retx!
+\item Tailored to application requirements: More local retx for delay-sensitive traffic (VoIP) than for delay-tolerant traffic (file downloads).
+\item Knowledge of multiple paths: Introduces two more options. Especially beneficial in real-time communications.
+}
+
+%\begin{frame}{Measurement Study - Link-Layer Retransmissions}
+%\includegraphics[width=1\linewidth]{images/measurements_linklayer.pdf}
+%\end{frame}
+
+
+
+%\item Local retx: Link-layer vs. CCN layer (knowledge of multiple paths)
+%\item ARQ, FEC, Phys. Layer techniques
+
+\begin{frame}{Real-time Communications}
+\vspace{-7mm}
+\begin{columns}[T]
+\column{0.48\linewidth}
+\centering
+\includegraphics[width=0.8\linewidth]{images/voip_phone.png}\\[2mm]
+\includegraphics[width=1.0\linewidth]{images/egoshooter.jpg}
+\column{0.52\linewidth}
+\begin{block}{VoIP / IP Video Conferencing}
+\begin{itemize}
+\item Playout Delay trade-off: Interactivity vs. Voice Quality \\
+\item FEC: App. layer redundancy
+\end{itemize}
+\end{block}
+
+\begin{block}{CCN Strategies}
+\begin{itemize}
+\item CCN layer redundancy
+\item Resolving bursty losses\\ 
+$\rightarrow$ Send on different interface\\
+\end{itemize}
+\end{block}
+\end{columns}
+\end{frame}
+
+\note[enumerate]{
+\scriptsize
+\item Real-time communications: VoIP, Video Conferencing, real-time games
+\item Each of them share following characteristics: 1) Very delay-sensitive, 2) Loss-tolerant, but only to a certain point, 3) Low throughput requirements.
+\item Example: Immersive 3D-Video (mentioned in keynote talk): Delay-sensitive, but high throughput.
+\item Playout delay: Making a tradeoff between loss of interactivity and loss of voice quality.\\
+Delay too long: Uncomfortable to speak, echos\\
+Delay too short: Throwing away late packets (late losses): Degrading voice quality.
+\item CCN layer redundancy: Only on lossy hop-to-hop link instead of whole path (more efficient)
+\item Bursty losses are a big problem for QoS, because late losses make retransmission nearly impossible
+\item $\rightarrow$ Redundancy/Retx on CCN layer to deal with loss bursts.
+}
+
+
+
+\begin{frame}[t]{Summary}
+\vspace{3mm}
+\large
+\begin{itemize}
+\item \textbf{CCN = solution for multihoming problems ?}
+\begin{itemize}
+\item Loop-free multipath routing
+\item Stateful forwarding
+\end{itemize}
+\item Current Forwarding Strategies are not quite ready 
+\begin{itemize}
+\item $\rightarrow$ Cross-Layer approach% : \\App. Requirements \& Access Network char.
+\item $\rightarrow$ Novel strategy design, implementation \& evaluation
+%\item $\rightarrow$ Evaluation (Simulation, Testbeds \& Real-world)
+\end{itemize}
+\item \textbf{$\rightarrow$ Many unexplored possibilities!}
+\end{itemize}
+\end{frame}
+
+
+\note[enumerate]{
+\item Additional example (also from talk before): Manipulating physical layer characteristics (WiFi FEC level, modulation techniques) adaptively to application requirements.
+}
+
+
+%% Last slide
+\begin{frame}
+\frametitle{The End}
+  \vspace{2cm}
+  {\huge Thank you for
+your attention!
+}
+  \vspace{2cm}  
+  \begin{flushright}  
+    Klaus Schneider \\ \footnotesize{\href{mailto:klaus.schneider@uni-bamberg.de}{klaus.schneider@uni-bamberg.de}}
+  \end{flushright}
+\end{frame}
+
+%
+%% Backup Slides
+\begin{frame}{Backup Slides}
+
+\end{frame}
+
+\begin{frame}{Measurement Study}
+\includegraphics<1>[width=1\linewidth]{images/measurements_time.pdf}
+\includegraphics<2>[width=1\linewidth]{images/measurements_interests.pdf}
+\includegraphics<3>[width=1\linewidth]{images/measurements_linklayer.pdf}
+\end{frame}

@@ -1,0 +1,37 @@
+\newenvironment{changemargin}[2]{%
+	\begin{list}{}{%
+			\setlength{\topsep}{-1pt}%
+			\setlength{\leftmargin}{#1}%
+			\setlength{\rightmargin}{#2}%
+			\setlength{\listparindent}{\parindent}%
+			\setlength{\itemindent}{\parindent}%
+			\setlength{\parsep}{\parskip}%
+		}%
+		\item[]}{\end{list}}
+ 
+\newcommand{\fullframeimage}[1]{
+	\begin{frame}[plain]
+		\begin{changemargin}{-1cm}{-1cm}
+			\begin{center}
+				\includegraphics[width=\paperwidth,height=\paperheight,keepaspectratio]
+				{#1}
+			\end{center}
+		\end{changemargin}
+	\end{frame}
+}
+
+\newcommand{\strong}[1]{ {\large \textbf{#1}} }
+
+\setbeamerfont{bibliography
+	entry author}{size=\scriptsize,%
+	series=\normalfont}
+\setbeamerfont{bibliography
+	entry title}{size=\scriptsize,%
+	series=\bfseries}
+\setbeamerfont{bibliography
+	entry location}{size=\tiny,%
+	series=\normalfont}
+
+\setbeamerfont{bibliography
+	item}{size=\scriptsize,%
+	series=\normalfont}
