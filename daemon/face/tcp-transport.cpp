@@ -26,6 +26,7 @@
 #include "tcp-transport.hpp"
 #include <ndn-cxx/lp/packet.hpp>
 #include <linux/sockios.h>
+#include <iostream>
 
 namespace nfd {
 namespace face {
