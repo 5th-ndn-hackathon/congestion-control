@@ -29,7 +29,13 @@
 #include "ethernet-protocol.hpp"
 #include "pcap-helper.hpp"
 #include "transport.hpp"
+
 #include <ndn-cxx/net/network-interface.hpp>
+
+#include <netlink/cache.h>
+#include <netlink/netlink.h>
+#include <netlink/route/link.h>
+#include <netlink/route/qdisc.h>
 
 namespace nfd {
 namespace face {
@@ -111,6 +117,14 @@ private:
   /// number of frames dropped by the kernel, as reported by libpcap
   size_t m_nDropped;
 #endif
+
+  struct nl_sock* m_nlSock;
+  struct nl_cache* m_nlCache;
+  struct nl_cache* m_nlQdiscCache;
+  struct rtnl_link* m_nlLink;
+  struct rtnl_qdisc* m_nlQdisc;
+  struct nl_cache_mngr* m_nlMngr;
+  int m_nlIfIndex;
 };
 
 } // namespace face

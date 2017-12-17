@@ -76,6 +76,9 @@ def configure(conf):
     conf.check_cfg(package='libndn-cxx', args=['--cflags', '--libs'],
                    uselib_store='NDN_CXX', mandatory=True)
 
+    conf.check_cfg(package='libnl-3.0', args=['--cflags', '--libs'], uselib_store='LIBNL', mandatory=True)
+    conf.check_cfg(package='libnl-route-3.0', args=['--cflags', '--libs'], uselib_store='LIBNLROUTE', mandatory=True)
+
     conf.checkDependency(name='librt', lib='rt', mandatory=False)
     conf.checkDependency(name='libresolv', lib='resolv', mandatory=False)
 
@@ -190,7 +193,7 @@ def build(bld):
         features='cxx pch',
         source=bld.path.ant_glob(['core/**/*.cpp'],
                                  excl=['core/logger*.cpp']),
-        use='version NDN_CXX BOOST LIBRT',
+        use='version NDN_CXX BOOST LIBRT LIBNL LIBNLROUTE',
         includes='. core',
         export_includes='.',
         headers='core/common.hpp')

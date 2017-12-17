@@ -27,10 +27,13 @@
 #include "ethernet-protocol.hpp"
 #include "core/global-io.hpp"
 
+#include <ndn-cxx/lp/packet.hpp>
+
 #include <pcap/pcap.h>
 
 #include <arpa/inet.h>  // for htons()
 #include <cstring>      // for memcpy()
+#include <iostream>
 
 namespace nfd {
 namespace face {
@@ -47,6 +50,7 @@ EthernetTransport::EthernetTransport(const ndn::net::NetworkInterface& localEndp
   , m_hasRecentlyReceived(false)
 #ifdef _DEBUG
   , m_nDropped(0)
+  , m_nlSock(nl_socket_alloc())
 #endif
 {
   try {
@@ -56,6 +60,16 @@ EthernetTransport::EthernetTransport(const ndn::net::NetworkInterface& localEndp
   catch (const PcapHelper::Error& e) {
     BOOST_THROW_EXCEPTION(Error(e.what()));
   }
+
+  int error = nl_cache_mngr_alloc(m_nlSock, NETLINK_ROUTE, NL_AUTO_PROVIDE, &m_nlMngr);
+  if (error < 0) {
+    NFD_LOG_FACE_ERROR("Netlink error on cache manager allocate: " << error);
+  }
+  nl_cache_mngr_add(m_nlMngr, "route/link", NULL, NULL, &m_nlCache);
+  if (!(m_nlLink = rtnl_link_get_by_name(m_nlCache, m_interfaceName.c_str()))) {
+    NFD_LOG_FACE_ERROR("Link '" << m_interfaceName << "' does not exist");
+  }
+  m_nlIfIndex = rtnl_link_get_ifindex(m_nlLink);
 
   asyncRead();
 }
@@ -100,18 +114,47 @@ EthernetTransport::sendPacket(const ndn::Block& block)
     buffer.appendByteArray(padding, ethernet::MIN_DATA_LEN - block.size());
   }
 
+  ndn::EncodingBuffer* bufferPtr = &buffer;
+
   // construct and prepend the ethernet header
   static uint16_t ethertype = htons(ethernet::ETHERTYPE_NDN);
   buffer.prependByteArray(reinterpret_cast<const uint8_t*>(&ethertype), ethernet::TYPE_LEN);
   buffer.prependByteArray(m_srcAddress.data(), m_srcAddress.size());
   buffer.prependByteArray(m_destAddress.data(), m_destAddress.size());
 
+  int errQdiscAlloc = rtnl_qdisc_alloc_cache(m_nlSock, &m_nlQdiscCache);
+  if (errQdiscAlloc < 0) {
+    NFD_LOG_FACE_ERROR("Unable to allocate libnl cache: " << errQdiscAlloc);
+  }
+
+  if (!(m_nlQdisc = rtnl_qdisc_get(m_nlQdiscCache, m_nlIfIndex, TC_HANDLE(1, 0)))) {
+    NFD_LOG_FACE_ERROR("Unable to find libnl handle");
+  }
+  else {
+    uint64_t qlen = rtnl_tc_get_stat(TC_CAST(m_nlQdisc), RTNL_TC_QLEN);
+    uint64_t backlog = rtnl_tc_get_stat(TC_CAST(m_nlQdisc), RTNL_TC_BACKLOG);
+    if (backlog > 0) {
+      std::cout << "CONGESTION: " << backlog << " out of " << qlen << " (" << ((double)backlog / (double)block.size()) << ")" << std::endl;
+      if (backlog > 50000) {
+        lp::Packet pkt(block);
+        pkt.add<lp::CongestionMarkField>(1);
+        ndn::EncodingBuffer pktBuffer(block);
+        // pad with zeroes if the payload is too short
+        if (pkt.wireEncode().size() < ethernet::MIN_DATA_LEN) {
+          static const uint8_t padding[ethernet::MIN_DATA_LEN] = {};
+          pktBuffer.appendByteArray(padding, ethernet::MIN_DATA_LEN - pkt.wireEncode().size());
+        }
+        bufferPtr = &pktBuffer;
+      }
+    }
+  }
+
   // send the frame
-  int sent = pcap_inject(m_pcap, buffer.buf(), buffer.size());
+  int sent = pcap_inject(m_pcap, bufferPtr->buf(), bufferPtr->size());
   if (sent < 0)
     handleError("Send operation failed: " + m_pcap.getLastError());
   else if (static_cast<size_t>(sent) < buffer.size())
-    handleError("Failed to send the full frame: size=" + to_string(buffer.size()) +
+    handleError("Failed to send the full frame: size=" + to_string(bufferPtr->size()) +
                 " sent=" + to_string(sent));
   else
     // print block size because we don't want to count the padding in buffer

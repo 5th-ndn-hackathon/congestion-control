@@ -29,6 +29,7 @@
 #include "transport.hpp"
 #include "core/global-io.hpp"
 
+#include <iostream>
 #include <queue>
 
 namespace nfd {
@@ -162,7 +163,7 @@ void
 StreamTransport<T>::doSend(Transport::Packet&& packet)
 {
   NFD_LOG_FACE_TRACE(__func__);
-  
+
   tcpCheck(packet);
 
   if (getState() != TransportState::UP)

@@ -148,16 +148,17 @@ DatagramTransport<T, U>::doSend(Transport::Packet&& packet)
   ioctl(m_socket.native_handle(), TIOCOUTQ, &tio);
   getsockopt(m_socket.native_handle(), SOL_SOCKET, SO_SNDBUF, &maxBufSize, &maxBufSizeLen);
   //ioctl(m_socket.native_handle(), SIOCOUTQNSD, &sio);
-  lp::Packet pkt(packet.packet);
   if (tio > 0) {
     size_t pktSize = packet.packet.size();
     std::cout << "CONGESTION: " << tio << " out of " << maxBufSize << " (" << ((double)tio / (double)pktSize) << ")" << std::endl;
     if (tio > 50000) {
+      lp::Packet pkt(packet.packet);
       pkt.add<lp::CongestionMarkField>(1);
+      packet.packet = pkt.wireEncode();
     }
   }
 
-  m_socket.async_send(boost::asio::buffer(pkt.wireEncode()),
+  m_socket.async_send(boost::asio::buffer(packet.packet),
                       bind(&DatagramTransport<T, U>::handleSend, this,
                            boost::asio::placeholders::error,
                            boost::asio::placeholders::bytes_transferred,
