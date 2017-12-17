@@ -87,6 +87,9 @@ protected:
   void
   resetSendQueue();
 
+  virtual void
+  tcpCheck(Transport::Packet& packet) {};
+
 protected:
   typename protocol::socket m_socket;
 
@@ -159,6 +162,8 @@ void
 StreamTransport<T>::doSend(Transport::Packet&& packet)
 {
   NFD_LOG_FACE_TRACE(__func__);
+  
+  tcpCheck(packet);
 
   if (getState() != TransportState::UP)
     return;
