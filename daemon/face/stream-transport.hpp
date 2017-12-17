@@ -199,8 +199,8 @@ StreamTransport<T>::handleSend(const boost::system::error_code& error,
 
   m_sendQueue.pop();
 
-  if () {
-    std::cout << "" << std::endl;
+  if (m_sendQueue.size() > 0) {
+    std::cout << "size of sendQueu= " << m_sendQueue.size() << std::endl;
   }
 
   if (!m_sendQueue.empty())
