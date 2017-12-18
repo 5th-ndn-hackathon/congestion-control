@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2017.8.31)  17 DEC 2017 13:53
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2017.8.31)  18 DEC 2017 13:46
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -769,8 +769,7 @@ Package: beamerfontthememetropolis 2017/01/23 Metropolis font theme
 Package beamerthememetropolis Warning: You need to compile with XeLaTeX or LuaL
 aTeX to use the Fira fonts on input line 95.
 
-)) (./config/commands.tex)
-(/usr/share/texlive/texmf-dist/tex/latex/multirow/multirow.sty
+)) (/usr/share/texlive/texmf-dist/tex/latex/multirow/multirow.sty
 Package: multirow 2016/11/25 v2.2 Span multiple rows of a table
 \multirow@colwidth=\skip69
 \multirow@cntb=\count165
@@ -1105,10 +1104,10 @@ Overfull \vbox (45.59123pt too high) detected at line 27
 
 [1
 
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] (./content/content.tex
-[2
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] (./content.tex [2
 
-] [3
+]
+[3
 
 ]
 LaTeX Font Info:    Try loading font information for OMS+lmss on input line 33.
@@ -1257,10 +1256,10 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
  ) 
 Here is how much of TeX's memory you used:
- 21741 strings out of 494936
- 430283 string characters out of 6180919
- 491574 words of memory out of 5000000
- 24491 multiletter control sequences out of 15000+600000
+ 21730 strings out of 494936
+ 430089 string characters out of 6180919
+ 491319 words of memory out of 5000000
+ 24485 multiletter control sequences out of 15000+600000
  66132 words of font info for 63 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  71i,13n,83p,1877b,538s stack positions out of 5000i,500n,10000p,200000b,80000s
