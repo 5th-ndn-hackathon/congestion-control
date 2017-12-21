@@ -31,6 +31,8 @@
 
 #include <iostream>
 #include <queue>
+#include <linux/sockios.h>
+#include <ndn-cxx/lp/packet.hpp>
 
 namespace nfd {
 namespace face {
@@ -88,8 +90,8 @@ protected:
   void
   resetSendQueue();
 
-  virtual void
-  tcpCheck(Transport::Packet& packet) {};
+  void
+  checkCongestionLevel(Transport::Packet& packet);
 
 protected:
   typename protocol::socket m_socket;
@@ -100,6 +102,7 @@ protected:
   uint8_t m_receiveBuffer[ndn::MAX_NDN_PACKET_SIZE];
   size_t m_receiveBufferSize;
   std::queue<Block> m_sendQueue;
+  size_t maxSendQueue {0};
 };
 
 
@@ -164,7 +167,7 @@ StreamTransport<T>::doSend(Transport::Packet&& packet)
 {
   NFD_LOG_FACE_TRACE(__func__);
 
-  tcpCheck(packet);
+  checkCongestionLevel(packet);
 
   if (getState() != TransportState::UP)
     return;
@@ -176,6 +179,7 @@ StreamTransport<T>::doSend(Transport::Packet&& packet)
     sendFromQueue();
 }
 
+
 template<class T>
 void
 StreamTransport<T>::sendFromQueue()
@@ -184,6 +188,33 @@ StreamTransport<T>::sendFromQueue()
                            bind(&StreamTransport<T>::handleSend, this,
                                 boost::asio::placeholders::error,
                                 boost::asio::placeholders::bytes_transferred));
+}
+
+
+template<class T>
+void
+StreamTransport<T>::checkCongestionLevel(Transport::Packet& packet)
+{
+  int sio {-1};
+  int tio {-1};
+  int maxBufSize {-1};
+  socklen_t maxBufSizeLen = sizeof(maxBufSize);
+  getsockopt(m_socket.native_handle(), SOL_SOCKET, SO_SNDBUF, &maxBufSize, &maxBufSizeLen);
+  const int MAX_TIOCOUTQ = maxBufSize/3; // In Bytes. // was 50000;
+
+  ioctl(m_socket.native_handle(), TIOCOUTQ, &tio);
+  ioctl(m_socket.native_handle(), SIOCOUTQNSD, &sio);
+  if (tio > MAX_TIOCOUTQ) {
+//      || m_sendQueue.size() > MAX_SENDQUEUE) {
+//    size_t pktSize = packet.packet.size();
+    std::cout << "CONGESTION -- COUTQ: " << tio /1024 << "KB out of " << maxBufSize /1024
+        << "KB, sendQueue.size(): " << m_sendQueue.size() << "\n";
+
+    // TODO: When TIOCOUTQ Buffer isn't full -> SendQueue is always 0!!!
+    lp::Packet pkt(packet.packet);
+    pkt.set<lp::CongestionMarkField>(1);
+    packet.packet = pkt.wireEncode();
+  }
 }
 
 template<class T>
@@ -199,9 +230,15 @@ StreamTransport<T>::handleSend(const boost::system::error_code& error,
   BOOST_ASSERT(!m_sendQueue.empty());
 
   m_sendQueue.pop();
+  const auto sendQueueSize = m_sendQueue.size();
 
-  if (m_sendQueue.size() > 0) {
-    std::cout << "size of sendQueu= " << m_sendQueue.size() << std::endl;
+  if (sendQueueSize > maxSendQueue) {
+    maxSendQueue = sendQueueSize;
+  }
+  if (sendQueueSize > 0 && sendQueueSize % 5 == 0) {
+//  const auto bytesInQueue = sendQueueSize * m_sendQueue.back().size();
+//  NFD_LOG_FACE_INFO("sendQueue: " << sendQueueSize << ", max: " << maxSendQueue << "\n");
+    std::cout << "sendQueue: " << sendQueueSize << ", max: " << maxSendQueue << "\n";
   }
 
   if (!m_sendQueue.empty())
